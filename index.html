@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простой чат с скачиванием файла</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .chat-area {
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .message.received {
+            background-color: #f1f1f1;
+            margin-right: auto;
+        }
+        
+        .message.sent {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .download-section {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .download-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .download-btn:hover {
+            background-color: #218838;
+        }
+        
+        .download-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .instructions {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 6px;
+            border-left: 4px solid #ffc107;
+            font-size: 14px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .file-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .icon {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Простой чат</h1>
+            <p class="subtitle">С кнопкой для скачивания файла</p>
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message received">
+                Привет! Здесь можно скачать файл.
+            </div>
+            <div class="message sent">
+                Отлично! Где кнопка для скачивания?
+            </div>
+            <div class="message received">
+                Внизу страницы. Файл называется "document.pdf"
+            </div>
+        </div>
+        
+        <div class="download-section">
+            <button class="download-btn" id="downloadBtn">
+                <span class="icon">⬇️</span> Скачать файл
+            </button>
+            <p class="file-info">Файл: document.pdf (размер: 1.2 МБ)</p>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <h3>Как сделать так, чтобы файл скачивался:</h3>
+        <p><strong>Способ 1:</strong> Положить файл в ту же папку, что и HTML-файл, и указать его имя в атрибуте <code>download</code> тега <code>&lt;a&gt;</code></p>
+        <p><strong>Способ 2:</strong> Использовать JavaScript для создания временной ссылки с файлом (как в этом примере)</p>
+        <p><strong>Способ 3:</strong> Загрузить файл на сервер и указать прямой URL к нему в атрибуте <code>href</code></p>
+    </div>
+
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            // Создаем содержимое файла (в реальном случае это был бы ваш файл)
+            const fileContent = `Это содержимое файла для скачивания.\n\nВы можете заменить этот текст на любой файл:\n- Текстовый документ\n- Изображение\n- PDF документ\n- Или любой другой файл\n\nСоздано: ${new Date().toLocaleString()}`;
+            
+            // Создаем Blob из содержимого
+            const blob = new Blob([fileContent], { type: 'text/plain' });
+            
+            // Создаем URL для Blob
+            const url = URL.createObjectURL(blob);
+            
+            // Создаем временный элемент ссылки
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'document.txt'; // Имя файла для скачивания
+            
+            // Добавляем ссылку в DOM, кликаем и удаляем
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Освобождаем память
+            URL.revokeObjectURL(url);
+            
+            // Добавляем сообщение в чат
+            const chatArea = document.getElementById('chatArea');
+            const message = document.createElement('div');
+            message.className = 'message sent';
+            message.textContent = 'Файл скачивается...';
+            chatArea.appendChild(message);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            
+            // Меняем текст кнопки на короткое время
+            const btn = document.getElementById('downloadBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="icon">✅</span> Скачано!';
+            btn.style.backgroundColor = '#6c757d';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.backgroundColor = '';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
